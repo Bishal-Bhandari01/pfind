@@ -1,105 +1,119 @@
-# PFind - Parameter Finding Tool
+# 🔍 PatternFinder (Pfind)
 
-A tool for discovering and validating URL parameters using waybackurls and gf-patterns.
+**PatternFinder (Pfind)** is a lightweight, multi-threaded URL scanning tool that checks URLs against custom regex patterns (stored in JSON format). It validates URLs, matches them against patterns, saves organized outputs per pattern, and generates a complete JSON report.
 
-## Requirements
+---
 
-- Python 3.x
-- Go (for installing waybackurls and gf)
-- Git
+## 🚀 Features
 
-## Installation
+- ✅ Scans and validates URLs from a file
+- 📂 Loads reusable regex patterns from `~/.gf/` (in JSON format)
+- 🔎 Identifies matches per pattern
+- 🧠 Saves matched URLs into organized `.txt` files (per pattern)
+- 🗃️ Outputs a detailed `JSON` scan report
+- ⚡ Multi-threaded for faster scanning
+- 🎨 Colored terminal output using `colorama`
 
-1. **Install Required Python Packages**
+---
+
+## 📁 Directory Structure
+
+```text
+.
+├── pfind.py                    # Main script
+├── pattern_matches/           # (Auto-created) Stores matched URLs by pattern
+├── pattern_scan_results_*.json # JSON reports from scans
+└── ~/.gf/                     # Folder containing your pattern JSON files
+```
+
+---
+
+## 🛠️ Requirements
+
+- Python 3.7+
+- Install dependencies:
 ```bash
-pip install -r requirements.txt
+pip install colorama
 ```
 
-2. **Install Go Tools**
+---
+
+## 📦 Pattern Format
+All pattern files must be stored in ~/.gf/ and follow this format:
+
+```json
+{
+  "patterns": [
+    "admin\\.php",
+    "login\\?user=.*",
+    "wp-json.*"
+  ]
+}
+```
+Each file should be named like admin_panels.json, wordpress.json, etc.
+
+---
+
+## 📑 Usage
+1. Prepare your input file:
+A plain text file with one URL per line.
+
+```text
+https://example.com/login?user=admin
+http://site.org/wp-json/
+https://test.com/admin.php
+```
+2. Run the script:
 ```bash
-# Install waybackurls
-GO111MODULE=on go install github.com/tomnomnom/waybackurls@latest
-
-# Install gf
-GO111MODULE=on go install github.com/tomnomnom/gf@latest
+python3 pfind.py urls.txt
 ```
+3. Output:
+Matched URLs saved under `pattern_matches/<pattern_name>.txt`
 
-3. **Setup gf-patterns**
-```bash
-# Create gf directory
-mkdir -p ~/.gf
+Full scan report: `pattern_scan_results_<timestamp>.json`
 
-# Clone gf-patterns repository
-git clone https://github.com/1ndianl33t/Gf-Patterns
-mv Gf-Patterns/*.json ~/.gf/
+Console summary with colorized output
 
-# Additional patterns (optional)
-git clone https://github.com/tomnomnom/gf
-mv gf/examples/*.json ~/.gf/
+---
+
+## 📊 Output Example
+JSON Report Excerpt:
+
+```json
+{
+  "metadata": {
+    "scan_time": "2025-06-04T13:25:01.123",
+    "total_urls": 20,
+    "valid_urls": 18,
+    "patterns_loaded": 5
+  },
+  "summary": {
+    "total_matches": 9,
+    "patterns_matched": {
+      "login": 3,
+      "admin": 2
+    }
+  }
+}
 ```
+---
 
-4. **Add Go binary path to your shell**
-```bash
-echo 'export PATH=$PATH:~/go/bin' >> ~/.bashrc
-source ~/.bashrc
-```
+## 🧠 How It Works
+ - Loads regex patterns from JSON files in `~/.gf/`
+ - Validates URLs (structure, scheme)
+ - Uses multi-threading (`ThreadPoolExecutor`) to scan faster
+ - Matches URLs to all loaded patterns
+ - Saves results in structured `.txt` and `.json` files
 
-## Usage
+---
 
-Basic usage:
-```bash
-python pfind.py -d example.com -t 10
-```
+## 🔒 Disclaimer
+This tool is intended for educational and legitimate security testing purposes only. Unauthorized scanning of systems you don’t own is illegal.
 
-Options:
-- `-d, --domain`: Target domain
-- `-t, --threads`: Number of threads (default: 10)
-- `-o, --output`: Output file path
+---
 
-## Features
+## 🧑‍💻 Author
+Built with ❤️ by `Bishal Bhandari`
+Feel free to contribute or fork!
 
-- Fetches URLs using waybackurls
-- Analyzes URLs using gf-patterns
-- Validates working parameters
-- Saves results by pattern type
-- Multi-threaded processing
-
-## Output Structure
-
-```
-results/
-├── xss.txt
-├── sqli.txt
-├── ssrf.txt
-└── summary.json
-```
-
-## Common gf-patterns
-
-- `xss`: Cross-site scripting parameters
-- `sqli`: SQL injection parameters
-- `ssrf`: Server-side request forgery parameters
-- `rce`: Remote code execution parameters
-- `redirect`: Open redirect parameters
-- `lfi`: Local file inclusion parameters
-
-## Example Commands
-
-```bash
-# Basic scan
-python pfind.py -d example.com
-
-# Scan with 20 threads and save output
-python pfind.py -d example.com -t 20 -o results.txt
-
-# Process existing URL list
-cat urls.txt | python pfind.py
-```
-
-## Note
-
-Make sure to respect the target website's terms of service and rate limits when using this tool.
-
-## License
-
-MIT License
+Let me know if you want me to include example pattern files (`.json`), CLI flags, or Docker usage instructions in the README.
